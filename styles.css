@@ -505,76 +505,150 @@ ANIMATIONS
 }
 
 /* ======================================
-   RESPONSIVE STYLES (Down to 240px Wide)
+   CRITICAL GLOBAL RESET FOR MOBILE (Fixes alignment & cutoff)
    ====================================== */
-
-/* --- 1. Ultra-Narrow Devices (240px to 360px) --- 
-   Targets smartwatches, tiny phones, and tight split-screens */
-@media (max-width: 360px) {
-    .main-container {
-        padding: 8px; /* Minimize padding to maximize reading space */
+@media (max-width: 768px) {
+    /* Forces everything to calculate widths correctly including padding */
+    *, *:before, *:after {
+        box-sizing: border-box !important;
     }
 
+    /* Prevents the entire page from spilling over the right side */
+    html, body {
+        width: 100%;
+        overflow-x: hidden; 
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Force all major sections and cards to center themselves */
+    .main-container,
+    .top-header,
+    .system-status-card,
+    .metric-card,
+    .info-card,
+    .overview-grid,
+    .footer {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        float: none !important; /* Kills any accidental left-floating */
+    }
+}
+
+/* ======================================
+   RESPONSIVE BREAKPOINTS (Ultra-Narrow to Desktop)
+   ====================================== */
+
+/* --- 1. Ultra-Narrow / Problem Phones (240px to 360px) --- */
+@media (max-width: 360px) {
+    .main-container {
+        padding: 8px; 
+    }
+
+    /* Fixes Top Bar being cut off or shifted */
     .top-header {
         position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+    }
+
+    .header-content {
+        width: 100%;
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 12px;
     }
 
     .header-pill {
         width: 100%;
+        max-width: 100%;
         text-align: center;
-        padding: 6px; /* Tighter padding */
+        padding: 6px;
         font-size: 12px;
     }
 
+    .logo-section {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100%;
+    }
+
     .logo-svg {
-        width: 32px;  /* Scaled down from 42px */
+        width: 32px;
         height: 32px;
     }
 
     .logo-text h1 {
-        font-size: 15px; /* Keeps text on one line if possible */
+        font-size: 15px;
+        text-align: center;
     }
 
     .hero-section h2 {
-        font-size: 1.2rem; /* Scaled down to prevent awkward wrapping */
+        font-size: 1.2rem;
+        text-align: center;
     }
 
+    /* Fixes Status, pH, Water Level Cards centering & touching screen edges */
     .system-status-card,
     .metric-card,
     .info-card {
-        padding: 12px; /* Shrink card padding */
+        padding: 12px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important; /* Force content inside card to center */
+        justify-content: center !important;
+        text-align: center !important;
     }
 
     .large-value {
-        font-size: 1.8rem; /* Keeps large numbers readable without overflowing */
+        font-size: 1.8rem;
+        text-align: center;
+        width: 100%;
     }
 
-    /* Force the water tank to scale down proportionally */
     .water-tank {
+        width: 100% !important;
+        max-width: 100% !important; 
+        height: 140px;
+    }
+
+    /* Fixes System Overview not centering */
+    .overview-grid {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
         width: 100%;
-        max-width: 100%; /* Spans full width of the tiny screen */
-        height: 140px;   /* Dropped height to maintain aspect ratio */
+        gap: 12px;
     }
 
     .overview-item {
-        flex-direction: column;
-        text-align: center;
+        width: 100%;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
         gap: 4px;
     }
 
-    /* Stack any remaining inline elements */
     .header-right, 
     .status-header,
     .detail-item {
         flex-direction: column !important;
         align-items: center !important;
         text-align: center !important;
-        gap: 8px;
+        width: 100%;
     }
 
     .footer {
         padding: 15px 8px;
         font-size: 11px;
+        text-align: center;
     }
 }
 
@@ -584,14 +658,21 @@ ANIMATIONS
         padding: 12px;
     }
 
-    .top-header {
-        position: relative;
+    .top-header, .header-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .header-pill {
         width: 100%;
         text-align: center;
         padding: 10px;
+    }
+
+    .logo-section {
+        flex-direction: column;
+        align-items: center;
     }
 
     .logo-svg {
@@ -624,7 +705,7 @@ ANIMATIONS
 
     .overview-item {
         flex-direction: column;
-        text-align: center;
+        align-items: center;
     }
 
     .footer {
@@ -698,11 +779,7 @@ ANIMATIONS
         padding: 24px;
     }
 
-    .metrics-container {
-        grid-template-columns: 1fr;
-    }
-
-    .overview-grid {
+    .metrics-container, .overview-grid {
         grid-template-columns: 1fr;
     }
 
