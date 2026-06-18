@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HydroNova - Smart Hydroponics Monitoring System</title>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+
+
+</head>
+
+<body>
+<div id="bg-slideshow"></div>
+
+<header class="top-header">
+
+<div class="header-content">
+
+    <div class="logo-section">
+
+        <img src="assets/logo.svg" alt="HydroNova Logo" class="logo-svg">
+
+        <div class="logo-text">
+            <h1>HYDRONOVA</h1>
+            <p>Smart Hydroponics Monitoring System</p>
+        </div>
+
+    </div>
+
+    <div class="header-right">
+
+        <div class="header-pill">
+            <span id="currentDate">-- --, ----</span>
+        </div>
+
+        <div class="header-pill">
+            <span id="currentTime">00:00:00 AM</span>
+        </div>
+
+        <div class="header-pill system-pill">
+            <span>System</span>
+
+            <span id="systemStatus" class="status-offline">
+                Checking...
+            </span>
+
+            <span class="status-dot" id="statusIndicator"></span>
+        </div>
+
+    </div>
+
+</div>
+
+</header>
+
+<main class="main-container">
+
+<section class="hero-section">
+
+    <div class="hero-icon">
+
+        <img src="assets/health.svg" alt="Plant Health">
+
+    </div>
+
+    <h2>REAL-TIME MONITORING</h2>
+
+    <p>
+        Monitoring essential hydroponic parameters
+        for healthy and sustainable plant growth.
+    </p>
+
+</section>
+
+<section class="system-status-card" id="statusCard">
+
+    <div class="status-card-content">
+
+        <div class="status-header">
+
+            <img src="assets/online.svg" alt="Status">
+
+            <h3>System Status</h3>
+
+        </div>
+
+        <div class="status-message" id="statusMessage">
+
+            <p id="statusText">
+                Awaiting communication from ESP32...
+            </p>
+
+        </div>
+
+        <div class="status-details">
+
+            <div class="detail-item">
+
+                <span class="detail-label">
+                    Overall Health
+                </span>
+
+                <span
+                    class="detail-value"
+                    id="overallHealthStatus">
+                    Healthy
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="metrics-container">
+
+    <div class="metric-card">
+
+        <div class="card-header">
+
+            <div class="card-title">
+
+                <img
+                    src="assets/ph.svg"
+                    class="metric-icon"
+                    alt="pH">
+
+                <h3>pH LEVEL</h3>
+
+            </div>
+
+            <span
+                class="status-badge"
+                id="phStatusBadge">
+                Normal
+            </span>
+
+        </div>
+
+        <div class="value-container">
+
+            <span
+                class="large-value"
+                id="phValue">
+                --
+            </span>
+
+            <span class="optimal-range">
+                Optimal Range: 5.5 - 6.5
+            </span>
+
+        </div>
+
+        <div class="chart-container">
+
+            <canvas id="phChart"></canvas>
+
+        </div>
+
+        <div class="card-footer">
+
+            <p id="phMessage">
+                Nutrient solution pH is within the
+                ideal range for healthy plant growth.
+            </p>
+
+        </div>
+
+    </div>
+
+    <div class="metric-card">
+
+        <div class="card-header">
+
+            <div class="card-title">
+
+                <img
+                    src="assets/water-level.svg"
+                    class="metric-icon"
+                    alt="Water">
+
+                <h3>WATER LEVEL</h3>
+
+            </div>
+
+            <span
+                class="status-badge"
+                id="waterStatusBadge">
+                Normal
+            </span>
+
+        </div>
+
+        <div class="value-container">
+
+            <span
+                class="large-value"
+                id="waterLevel">
+                --
+            </span>
+
+            <span class="percentage">
+                %
+            </span>
+
+        </div>
+
+        <div class="water-visualization">
+
+            <div class="water-tank">
+
+                <div
+                    class="water-fill"
+                    id="waterFill">
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="card-footer">
+
+            <p id="waterMessage">
+                Water supply is adequate for
+                continuous hydroponic circulation.
+            </p>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section class="info-card">
+
+    <div class="section-heading">
+
+        <h4>System Overview</h4>
+
+        <p>
+            Core infrastructure powering HydroNova
+        </p>
+
+    </div>
+
+    <div class="overview-grid">
+
+        <div class="overview-item">
+
+            <img src="assets/esp32.svg" alt="ESP32">
+
+            <div>
+
+                <span class="overview-label">
+                    Microcontroller
+                </span>
+
+                <span class="overview-value">
+                    ESP32
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="overview-item">
+
+            <img src="assets/solar.svg" alt="Solar">
+
+            <div>
+
+                <span class="overview-label">
+                    Power Source
+                </span>
+
+                <span class="overview-value">
+                    Solar Energy
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="overview-item">
+
+            <img src="assets/wifi.svg" alt="WiFi">
+
+            <div>
+
+                <span class="overview-label">
+                    Connectivity
+                </span>
+
+                <span class="overview-value">
+                    Wi-Fi
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="overview-item">
+
+            <img src="assets/packet.svg" alt="Packet">
+
+            <div>
+
+                <span class="overview-label">
+                    Last Packet Received
+                </span>
+
+                <span
+                    class="overview-value"
+                    id="lastUpdated">
+                    --:--
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="about-divider"></div>
+
+    <div class="section-heading">
+
+        <h4>About HydroNova</h4>
+
+    </div>
+
+    <p class="about-text">
+
+        HydroNova is an IoT-powered hydroponic
+        monitoring system that provides real-time
+        tracking of nutrient solution's pH level and reservoir
+        water levels while utilizing solar energy
+        for sustainable smart farming.
+
+    </p>
+
+</section>
+
+
+</main>
+
+<footer class="footer">
+<p>
+    HydroNova | Project by: Pantoja, El Jay & Bon, Rubelyn & Legion, Mark Aerol | 2026
+</p>
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+</html>
