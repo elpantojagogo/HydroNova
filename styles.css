@@ -547,7 +547,6 @@ ANIMATIONS
         padding: 8px; 
     }
 
-    /* Fixes Top Bar being cut off or shifted */
     .top-header {
         position: relative;
         display: flex;
@@ -595,14 +594,38 @@ ANIMATIONS
         text-align: center;
     }
 
-    /* Fixes Status, pH, Water Level Cards centering & touching screen edges */
-    .system-status-card,
+    /* --- FIX: Enable internal horizontal scroll for tight cards --- */
     .metric-card,
-    .info-card {
+    .info-card,
+    .chart-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: auto !important;    /* Allows swipe-to-scroll horizontally */
+        overflow-y: hidden;
+        white-space: nowrap;            /* Prevents nested layout breakage */
+        -webkit-overflow-scrolling: touch; /* Makes scrolling buttery smooth on iPhones */
+        padding: 12px !important;
+    }
+
+    /* Custom subtle scrollbar styling so it looks clean */
+    .metric-card::-webkit-scrollbar,
+    .info-card::-webkit-scrollbar,
+    .chart-container::-webkit-scrollbar {
+        height: 4px;
+    }
+    .metric-card::-webkit-scrollbar-thumb,
+    .info-card::-webkit-scrollbar-thumb,
+    .chart-container::-webkit-scrollbar-thumb {
+        background: rgba(0,0,0,0.15);
+        border-radius: 4px;
+    }
+
+    /* Keeps the status card stacked normally since it doesn't need to scroll */
+    .system-status-card {
         padding: 12px !important;
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important; /* Force content inside card to center */
+        align-items: center !important;
         justify-content: center !important;
         text-align: center !important;
     }
@@ -617,9 +640,9 @@ ANIMATIONS
         width: 100% !important;
         max-width: 100% !important; 
         height: 140px;
+        display: inline-block; /* Keeps it stable inside a scrolling container if nested */
     }
 
-    /* Fixes System Overview not centering */
     .overview-grid {
         display: flex !important;
         flex-direction: column !important;
@@ -656,6 +679,12 @@ ANIMATIONS
 @media (min-width: 361px) and (max-width: 480px) {
     .main-container {
         padding: 12px;
+    }
+
+    /* Apply safety scrolling to standard mobile sizes too just in case */
+    .metric-card, .info-card, .chart-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
     }
 
     .top-header, .header-content {
@@ -817,5 +846,133 @@ ANIMATIONS
 
     .metrics-container {
         grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    }
+}
+/* ======================================
+   THE BULLETPROOF MOBILE FIX (No Infinite Scrolling)
+   ====================================== */
+@media (max-width: 768px) {
+    /* 1. Kill the infinite vertical scroll loop */
+    html, body {
+        width: 100% !important;
+        max-width: 100vw !important;
+        overflow-x: hidden !important; 
+        overflow-y: auto !important; /* Force normal vertical scrolling only */
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* 2. Center the main container normally */
+    .main-container {
+        width: 100% !important;
+        max-width: 100vw !important;
+        margin: 0 auto !important;
+        padding: 12px !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 3. Stack grids cleanly without causing infinite height calculation */
+    .metrics-container, 
+    .overview-grid {
+        display: block !important; /* Temporarily switch from Flex/Grid to Block to stop height loops */
+        width: 100% !important;
+    }
+
+    /* 4. Force cards to stay inside the screen and center them using block margins */
+    .system-status-card,
+    .metric-card,
+    .info-card {
+        width: calc(100vw - 24px) !important; 
+        max-width: calc(100vw - 24px) !important;
+        margin: 0 auto 16px auto !important; /* Centers them perfectly, adds space below */
+        box-sizing: border-box !important;
+        overflow-x: auto !important; /* Keep horizontal swiping inside the card */
+        overflow-y: hidden !important;
+        -webkit-overflow-scrolling: touch !important;
+        padding: 16px !important;
+        display: block !important; /* Prevents flex alignment weirdness inside the card */
+    }
+
+    /* 5. HARD CONTROL FOR CHARTS & WATER TANKS (Stops the infinite expanding loop) */
+    .chart-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 200px !important; /* Force a hard fixed height on mobile */
+        position: relative !important;
+    }
+
+    .chart-container canvas {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 200px !important; /* Force the canvas to match */
+    }
+
+    .water-tank {
+        width: 100% !important;
+        max-width: 240px !important; /* Put a strict cap on its width */
+        height: 150px !important; /* Put a strict cap on its height */
+        margin: 0 auto !important; /* Centers it inside the scrolling card */
+        display: block !important;
+    }
+
+    /* 6. Keep typography and small sub-items clean */
+    .large-value {
+        font-size: 2rem !important;
+        text-align: center !important;
+        display: block !important;
+        width: 100% !important;
+        margin: 10px 0 !important;
+    }
+
+    .top-header, .header-content, .logo-section {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+}
+/* ======================================
+   DYNAMIC HEIGHT & TEXT WRAPPING FIX
+   ====================================== */
+@media (max-width: 768px) {
+    /* 1. Force cards to shrink vertically around their contents */
+    .system-status-card,
+    .metric-card,
+    .info-card {
+        height: auto !important;          /* Destroys any rigid height forcing the card to stay big */
+        min-height: 0 !important;         /* Allows it to collapse safely */
+        max-height: none !important;
+        align-self: center !important;    /* Prevents grid/flex from stretching them vertically */
+    }
+
+    /* 2. Reset the grid/flex parent layout to stop enforcing height stretch */
+    .metrics-container, 
+    .overview-grid,
+    .overview-item {
+        height: auto !important;
+        align-items: center !important;   /* Centers elements without stretching them */
+    }
+
+    /* 3. Keep the text beautifully wrapped and fluid */
+    .metric-card p,
+    .info-card p,
+    .system-status-card p,
+    .overview-item p {
+        white-space: normal !important;      
+        word-wrap: break-word !important;    
+        overflow-wrap: break-word !important;
+        width: 100% !important;              
+        max-width: 100% !important;
+        height: auto !important;          /* Ensures text doesn't hold an old hidden height */
+        margin: 8px 0 !important;         /* Clean, tight spacing */
+        text-align: justify;
+    }
+
+    /* 4. If there is a chart or water tank inside keeping it tall, handle it here */
+    .chart-container,
+    .chart-container canvas {
+        /* Only apply a height if the element actually exists, otherwise let it collapse */
+        height: 180px !important; 
     }
 }
